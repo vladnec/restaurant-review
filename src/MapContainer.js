@@ -54,6 +54,9 @@ export class MapContainer extends Component {
           }}
           name={"You are here !"}
           onClick={this.onMarkerClick}
+          icon={{
+            url:  "images/location_pin.png"
+          }}
         />
       );
   }

@@ -38,29 +38,28 @@ class App extends Component {
       navigator.geolocation.getCurrentPosition(resolve, reject);
     });
   }
-
+  getStreetView(lat,lng){
+    let url = `https://maps.googleapis.com/maps/api/streetview?size=600x300&location=${lat},${lng}&heading=0&pitch=-0.76&key=${API_KEY}`
+    return axios.get(url).then(response => {
+      return response.config.url
+    })
+  }
+  
   getNearbyPlaces() {
-    const radius = 500;
+    const radius = 300;
     const { lat, lng } = this.state;
-    const newRestaurants = [];
 
-    axios
-      .get(
-        `${"https://cors-anywhere.herokuapp.com/"}https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=${radius}&type=restaurant&key=${API_KEY}`,
-        {
-          headers: {
-            "Access-Control-Allow-Origin": "http://localhost:3000/"
-          }
-        }
-      )
-      .then(response => {
-        response.data.results.map(item => {
-          newRestaurants.push(item);
-        });
-        this.setState({
-          restaurantsNearby: newRestaurants
-        });
-      });
+    axios.get(`${"https://cors-anywhere.herokuapp.com/"}https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=${radius}&type=restaurant&key=${API_KEY}`,{
+      headers: { "Access-Control-Allow-Origin": "http://localhost:3000/" }
+        })
+    .then(response => {
+      response.data.results.map(item => {
+        axios.get(`${'https://cors-anywhere.herokuapp.com/'}https://maps.googleapis.com/maps/api/place/details/json?placeid=${item.place_id}&key=${API_KEY}`, {headers:{'Access-Control-Allow-Origin': 'http://localhost:3000/'}})
+        .then(response => {
+         this.setState(prevState=>({restaurantsNearby:[...prevState.restaurantsNearby, response.data.result]}))
+        })
+      })
+    })
   }
 
   render() {
@@ -75,9 +74,10 @@ class App extends Component {
           <Grid item md={6}>
             <MapContainer 
               restaurantsNearby={this.state.restaurantsNearby}
+              getStreetView={this.getStreetView}
               lat={this.state.lat} 
               lng={this.state.lng} 
-              zoom={14} />
+              zoom={16} />
           </Grid>
 
           <Grid item md={6}>
