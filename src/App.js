@@ -12,7 +12,13 @@ class App extends Component {
     this.state = {
       restaurantsNearby: [],
       lat: null,
-      lng: null
+      lng: null,
+      newRestaurantLat:null,
+      newRestaurantLng:null,
+      newRestaurantName:null,
+      newRestaurantRating:null,
+      newRestaurantAddress:null,
+      newRestaurantReviews:[]
     };
   }
   _isMounted = false;
@@ -32,32 +38,36 @@ class App extends Component {
         console.error(err.message);
       });
   }
-  onMapClickChange(x, y, formattedAddress) {
-        this.setState({
-          restaurantsNearby:[
-            {
-              name: "Gica",
-                formatted_address: formattedAddress,
-                geometry: {
-                  location: {
-                    lat: x,
-                    lng: y
-                  }
-                },
-                restaurantId: 2,
-                rating: 3,
-                reviews: [
-                  {
-                    author_name:"vlad",
-                    rating:5,
-                    text:"very clean, nice"
-                  }
-                ]
-            },
-            ...this.state.restaurantsNearby
-        ],
+  onRestaurantFormSubmit() {
+    this.setState({
+      restaurantsNearby: [{
+          name: "Gica",
+          formatted_address: formattedAddress,
+          geometry: {
+            location: {
+              lat: x,
+              lng: y
+            }
+          },
+          restaurantId: 2,
+          rating: 3,
+          reviews: [{
+            author_name: "vlad",
+            rating: 5,
+            text: "very clean, nice"
+          }]
+        },
+        ...this.state.restaurantsNearby
+      ],
     })
-
+  }
+  
+  onMapClickChange(lat, lng, formattedAddress) {
+    this.setState({
+      newRestaurantAddress: formattedAddress,
+      newRestaurantLat : lat,
+      newRestaurantLng : lng
+    })
   }
 
   getBrowserLocation() {
