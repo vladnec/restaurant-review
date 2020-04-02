@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import API_KEY from "./API_KEY";
+import axios from "axios";
 import { Map, Marker, InfoWindow,  GoogleApiWrapper } from "google-maps-react";
 
 export class MapContainer extends Component {
@@ -18,7 +19,19 @@ export class MapContainer extends Component {
       activeMarker: marker,
       showingInfoWindow: true
     });
-
+  mapClicked = (mapProps, map, event) => {
+     const lat = event.latLng.lat();
+     const lng = event.latLng.lng();
+     let url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${API_KEY}`
+     axios.get(url).then(response => {
+       if(response.data.status === "OK"){
+        this.props.onMapClickChange(lat, lng, response.data.results[0].formatted_address);
+      }
+      else {
+        console.log('error')
+      }
+   });
+  }  
   onClose = props => {
     if (this.state.showingInfoWindow) {
       this.setState({

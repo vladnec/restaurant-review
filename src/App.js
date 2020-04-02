@@ -32,6 +32,33 @@ class App extends Component {
         console.error(err.message);
       });
   }
+  onMapClickChange(x, y, formattedAddress) {
+        this.setState({
+          restaurantsNearby:[
+            {
+              name: "Gica",
+                formatted_address: formattedAddress,
+                geometry: {
+                  location: {
+                    lat: x,
+                    lng: y
+                  }
+                },
+                restaurantId: 2,
+                rating: 3,
+                reviews: [
+                  {
+                    author_name:"vlad",
+                    rating:5,
+                    text:"very clean, nice"
+                  }
+                ]
+            },
+            ...this.state.restaurantsNearby
+        ],
+    })
+
+  }
 
   getBrowserLocation() {
     return new Promise(function(resolve, reject) {
@@ -74,6 +101,7 @@ class App extends Component {
           <Grid item md={6}>
             <MapContainer 
               restaurantsNearby={this.state.restaurantsNearby}
+              onMapClickChange={(x, y, info) => this.onMapClickChange(x, y, info)} 
               getStreetView={this.getStreetView}
               lat={this.state.lat} 
               lng={this.state.lng} 
