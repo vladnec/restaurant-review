@@ -11,14 +11,19 @@ export class MapContainer extends Component {
         activeMarker: {}, //Shows the active marker upon click
         selectedPlace: {} //Shows the infoWindow to the selected place upon a marker
       };
+      this.onMarkerClick=this.onMarkerClick.bind(this)
   }
 
-  onMarkerClick = (props, marker, e) =>
+
+  onMarkerClick (props, marker, e) {
+    this.props.getStreetView(props.position.lat, props.position.lng)
     this.setState({
       selectedPlace: props,
       activeMarker: marker,
       showingInfoWindow: true
     });
+  }
+
   mapClicked = (mapProps, map, event) => {
      const lat = event.latLng.lat();
      const lng = event.latLng.lng();
@@ -51,7 +56,6 @@ export class MapContainer extends Component {
             lat: restaurant.geometry.location.lat,
             lng: restaurant.geometry.location.lng
           }}
-          name={restaurant.name}
           onClick={this.onMarkerClick}
         />
       );
@@ -82,7 +86,7 @@ export class MapContainer extends Component {
         onClose={this.onClose}
       >
         <div>
-          <h4>{this.state.selectedPlace.name}</h4>
+          <img src={this.props.restaurantStreetView} height="30px" width="30px" /> 
         </div>
       </InfoWindow>
     );

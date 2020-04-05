@@ -84,7 +84,7 @@ const ReviewCard = props => {
                 {restaurant.rating}
               </Typography>
             </Box>
-            {restaurant.reviews.length > 0  ? (
+            {restaurant.reviews && restaurant.reviews.length > 0? (
               <Typography color={'textSecondary'} variant={'body2'}>
                 {restaurant.reviews[0].text}
               </Typography>

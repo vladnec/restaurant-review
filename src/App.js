@@ -1,8 +1,10 @@
 import React, { Component } from "react";
 import MapContainer from "./MapContainer";
 import RestaurantsNearbyCard from "./components/restaurantsAPI";
+import NewRestaurantForm from "./components/restaurantForm/RegisterForm";
 import API_KEY from './API_KEY';
 
+import './styles/App.css';
 import axios from "axios";
 import Grid from "@material-ui/core/Grid";
 import Modal from 'react-responsive-modal';
@@ -20,8 +22,11 @@ class App extends Component {
       newRestaurantName:null,
       newRestaurantRating:null,
       newRestaurantAddress:null,
+      restaurantStreetView:null,
       newRestaurantReviews:[]
     };
+    this.onRestaurantFormSubmit=this.onRestaurantFormSubmit.bind(this)
+    this.getStreetView=this.getStreetView.bind(this)
   }
   _isMounted = false;
 
@@ -48,53 +53,19 @@ class App extends Component {
         console.error(err.message);
       });
   }
-  onRestaurantFormSubmit() {
-    // this.setState({
-    //   restaurantsNearby: [
-    //     {
-    //       name: "Gica",
-    //       formattedAddress: formattedAddress,
-    //       geometry: {
-    //         location: {
-    //           lat: x,
-    //           lng: y
-    //         }
-    //       },
-    //       restaurantId: 2,
-    //       rating: 3,
-    //       reviews: [
-    //         {
-    //           author_name: "vlad",
-    //           rating: 5,
-    //           text: "very clean, nice"
-    //         }
-    //       ]
-    //     },
-    //     ...this.state.restaurantsNearby
-    //   ]
-    // });
-  }
-
-  onMapClickChange(lat, lng, formattedAddress) {
-    this.onOpenModal()
-    // this.setState({
-    //   newRestaurantAddress: formattedAddress,
-    //   newRestaurantLat: lat,
-    //   newRestaurantLng: lng
-    // });
-        this.setState({
+  onRestaurantFormSubmit(formData) {
+    this.setState({
       restaurantsNearby: [
         {
-          name: "Gica",
-          formatted_address: formattedAddress,
+          name: formData.restaurantName,
+          formatted_address: this.state.newRestaurantAddress,
           geometry: {
             location: {
-              lat: lat,
-              lng: lng
+              lat: this.state.newRestaurantLat,
+              lng: this.state.newRestaurantLng
             }
           },
-          restaurantId: 2,
-          rating: 3,
+          rating: parseInt(formData.rating),
           reviews: [
             {
               author_name: "vlad",
@@ -106,6 +77,16 @@ class App extends Component {
         ...this.state.restaurantsNearby
       ]
     });
+    this.onCloseModal()
+  }
+
+  onMapClickChange(lat, lng, formattedAddress) {
+    this.onOpenModal()
+    this.setState({
+      newRestaurantAddress: formattedAddress,
+      newRestaurantLat: lat,
+      newRestaurantLng: lng
+    });
   }
 
   getBrowserLocation() {
@@ -114,14 +95,17 @@ class App extends Component {
     });
   }
   getStreetView(lat, lng) {
+    const self = this;
     let url = `https://maps.googleapis.com/maps/api/streetview?size=600x300&location=${lat},${lng}&heading=0&pitch=-0.76&key=${API_KEY}`;
-    return axios.get(url).then(response => {
-      return response.config.url;
+    axios.get(url).then(response => {
+      self.setState({
+        restaurantStreetView : response.config.url
+      }) 
     });
   }
 
   getNearbyPlaces() {
-    const radius = 80;
+    const radius = 1000;
     const { lat, lng } = this.state;
 
     axios
@@ -160,19 +144,12 @@ class App extends Component {
     const {open} = this.state;
     return (
       <div>
-        <Modal 
-          open={open}
-          closeIconSize={14}
-          onClose={this.onCloseModal}
-          center
-          >
-        </Modal>
         <Grid
           container
           direction="row"
           justify="flex-start"
           alignItems="flex-start"
-        >
+          >
           <Grid item md={6}>
             <MapContainer
               restaurantsNearby={this.state.restaurantsNearby}
@@ -180,6 +157,7 @@ class App extends Component {
                 this.onMapClickChange(x, y, info)
               }
               getStreetView={this.getStreetView}
+              restaurantStreetView = {this.state.restaurantStreetView}
               lat={this.state.lat}
               lng={this.state.lng}
               zoom={16}
@@ -196,6 +174,15 @@ class App extends Component {
             )}
           </Grid>
         </Grid>
+        <Modal 
+            open={open}
+            closeIconSize={14}
+            onClose={this.onCloseModal}
+            center>
+            <NewRestaurantForm
+            onRestaurantFormSubmit={this.onRestaurantFormSubmit}
+            />
+          </Modal>
       </div>
     );
   }
