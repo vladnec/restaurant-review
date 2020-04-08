@@ -105,7 +105,7 @@ class App extends Component {
   }
 
   getNearbyPlaces() {
-    const radius = 1000;
+    const radius = 350;
     const { lat, lng } = this.state;
 
     axios

@@ -57,6 +57,8 @@ export class MapContainer extends Component {
             lng: restaurant.geometry.location.lng
           }}
           onClick={this.onMarkerClick}
+          name={restaurant.name}
+          photoReference={restaurant.photos ? restaurant.photos[0].photo_reference : null}
         />
       );
     })
@@ -86,7 +88,9 @@ export class MapContainer extends Component {
         onClose={this.onClose}
       >
         <div>
-          <img src={this.props.restaurantStreetView} height="30px" width="30px" /> 
+          <h4>{this.state.selectedPlace.name}</h4>
+          <img src={this.props.restaurantStreetView} height="300px" width="600px" /> 
+          <img src={`https://maps.googleapis.com/maps/api/place/photo?maxwidth=600&photoreference=${this.state.selectedPlace.photoReference}&key=${API_KEY}`} height="300px" width="600px" /> 
         </div>
       </InfoWindow>
     );
