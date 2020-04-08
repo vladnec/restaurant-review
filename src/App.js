@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import MapContainer from "./MapContainer";
-import RestaurantsNearbyCard from "./components/restaurantsAPI";
+import GoogleRestaurantCard from "./components/GoogleRestaurantCard";
 import NewRestaurantForm from "./components/restaurantForm/RegisterForm";
 import API_KEY from './API_KEY';
 
@@ -24,6 +24,7 @@ class App extends Component {
       restaurantStreetView:null,
       newRestaurantReviews:[]
     };
+    this.changeRestaurantRating=this.changeRestaurantRating.bind(this)
     this.onRestaurantFormSubmit=this.onRestaurantFormSubmit.bind(this)
     this.getStreetView=this.getStreetView.bind(this)
   }
@@ -78,8 +79,42 @@ class App extends Component {
     });
     this.onCloseModal()
   }
-  onRatingClick(props) {
-    console.log(props)
+  changeRestaurantRating(nextValue, id) {
+    this.setState({
+      restaurantsNearby:this.state.restaurantsNearby.map(item=>{
+        if(item.id === id ){
+          if(item.hasRated) {
+            return {
+              ...item,
+              rating:nextValue,
+              hasRated: true,
+              user_ratings_total : item.user_ratings_total 
+            }
+          } else {
+            return {
+              ...item,
+              rating:nextValue,
+              hasRated: true,
+              user_ratings_total : item.user_ratings_total ? item.user_ratings_total + 1 : 1
+            }
+          }
+        }
+        return item;
+      }),
+    });
+  }
+
+  
+  displayGoogleRestaurants() {
+    return this.state.restaurantsNearby.map((restaurant, index) => {
+      return (
+        <GoogleRestaurantCard
+        key={index}
+        changeRestaurantRating={this.changeRestaurantRating}
+        restaurant={restaurant}
+        />
+      )
+    })
   }
   onMapClickChange(lat, lng, formattedAddress) {
     this.onOpenModal()
@@ -89,7 +124,6 @@ class App extends Component {
       newRestaurantLng: lng
     });
   }
-
   getBrowserLocation() {
     return new Promise(function(resolve, reject) {
       navigator.geolocation.getCurrentPosition(resolve, reject);
@@ -158,18 +192,8 @@ class App extends Component {
               zoom={16}
             />
           </div>
-
           <div className="restaurants-container">
-            {this.state.restaurantsNearby.length > 1 ? (
-              <RestaurantsNearbyCard
-                onRatingClick={(restaurant) =>
-                  this.onRatingClick(restaurant)
-                }
-                restaurantsNearby={this.state.restaurantsNearby}
-              />
-            ) : (
-              <div>loading</div>
-            )}
+              {this.displayGoogleRestaurants()}
           </div>
         <Modal 
             open={open}
