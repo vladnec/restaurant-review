@@ -89,8 +89,8 @@ export class MapContainer extends Component {
       >
         <div>
           <h4>{this.state.selectedPlace.name}</h4>
-          <img src={this.props.restaurantStreetView} height="300px" width="600px" /> 
-          <img src={`https://maps.googleapis.com/maps/api/place/photo?maxwidth=600&photoreference=${this.state.selectedPlace.photoReference}&key=${API_KEY}`} height="300px" width="600px" /> 
+          <img alt="Google Street View"src={this.props.restaurantStreetView} height="300px" width="600px" /> 
+          <img alt="Google Places Contribution" src={`https://maps.googleapis.com/maps/api/place/photo?maxwidth=600&photoreference=${this.state.selectedPlace.photoReference}&key=${API_KEY}`} height="300px" width="600px" /> 
         </div>
       </InfoWindow>
     );
@@ -102,7 +102,7 @@ export class MapContainer extends Component {
       return <div>Loading...</div>;
     }
     const mapStyle = {
-      width: "50%",
+      width: "100%",
       height: "100%",
       position: "relative",
       overflow: "hidden"

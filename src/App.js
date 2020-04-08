@@ -6,7 +6,6 @@ import API_KEY from './API_KEY';
 
 import './styles/App.css';
 import axios from "axios";
-import Grid from "@material-ui/core/Grid";
 import Modal from 'react-responsive-modal';
 
 class App extends Component {
@@ -79,7 +78,9 @@ class App extends Component {
     });
     this.onCloseModal()
   }
-
+  onRatingClick(props) {
+    console.log(props)
+  }
   onMapClickChange(lat, lng, formattedAddress) {
     this.onOpenModal()
     this.setState({
@@ -116,7 +117,7 @@ class App extends Component {
         }
       )
       .then(response => {
-        response.data.results.map(item => {
+        response.data.results.forEach(item => {
           axios
             .get(
               `${"https://cors-anywhere.herokuapp.com/"}https://maps.googleapis.com/maps/api/place/details/json?placeid=${
@@ -144,13 +145,7 @@ class App extends Component {
     const {open} = this.state;
     return (
       <div>
-        <Grid
-          container
-          direction="row"
-          justify="flex-start"
-          alignItems="flex-start"
-          >
-          <Grid item md={6}>
+         <div className="map-container">
             <MapContainer
               restaurantsNearby={this.state.restaurantsNearby}
               onMapClickChange={(x, y, info) =>
@@ -162,18 +157,20 @@ class App extends Component {
               lng={this.state.lng}
               zoom={16}
             />
-          </Grid>
+          </div>
 
-          <Grid item md={6}>
+          <div className="restaurants-container">
             {this.state.restaurantsNearby.length > 1 ? (
               <RestaurantsNearbyCard
+                onRatingClick={(restaurant) =>
+                  this.onRatingClick(restaurant)
+                }
                 restaurantsNearby={this.state.restaurantsNearby}
               />
             ) : (
               <div>loading</div>
             )}
-          </Grid>
-        </Grid>
+          </div>
         <Modal 
             open={open}
             closeIconSize={14}
