@@ -1,6 +1,5 @@
 import React from 'react';
 
-
 class ReviewRestaurantForm extends React.Component {
   constructor() {
     super();
@@ -17,7 +16,6 @@ class ReviewRestaurantForm extends React.Component {
     this.onFormSubmit = this.onFormSubmit.bind(this);
 
   };
-
   handleChange(e) {
     let fields = this.state.fields;
     fields[e.target.name] = e.target.value;
@@ -25,14 +23,12 @@ class ReviewRestaurantForm extends React.Component {
       fields
     });
   }
-
   onFormSubmit(e) {
     e.preventDefault();
     if (this.validateForm()) {
       this.props.onRestaurantRatingSubmit(this.state.fields)
     }
   }
-
   validateForm() {
     let fields = this.state.fields;
     let errors = {};
@@ -51,7 +47,6 @@ class ReviewRestaurantForm extends React.Component {
     });
     return formIsValid;
   }
-
   render() {
     return (
       <div id="main-registration-container">

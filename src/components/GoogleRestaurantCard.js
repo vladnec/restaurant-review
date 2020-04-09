@@ -9,7 +9,6 @@ import LocationOn from "@material-ui/icons/LocationOn";
 import StarRatingComponent from 'react-star-rating-component';
 import CloseIcon from '@material-ui/icons/Close';
 import PropTypes from "prop-types";
-import MoreHoriz from "@material-ui/icons/MoreHoriz";
 import FaceGroup from "@mui-treasury/components/group/face";
 
 const styles = (theme) => ({
@@ -58,7 +57,7 @@ const styles = (theme) => ({
 class RestaurantGoogleCard extends Component {
 
   onStarClick(nextValue, prevValue, name) {
-    this.props.changeRestaurantRating(nextValue, name)
+    this.props.onRestaurantRatingChange(nextValue, name)
   }
   onCloseClick(){
     this.props.removeGoogleRestaurant(this.props.restaurant.id)
@@ -116,9 +115,6 @@ class RestaurantGoogleCard extends Component {
                 {this.props.restaurant.user_ratings_total}
               </Typography>
             </Box>
-            <IconButton size={"small"}>
-              <MoreHoriz />
-            </IconButton>
           </Box>
         </CardContent>
       </Card>

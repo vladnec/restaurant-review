@@ -7,15 +7,13 @@ export class MapContainer extends Component {
   constructor(props) {
     super(props);
       this.state = {
-        showingInfoWindow: false, //Hides or the shows the infoWindow
-        activeMarker: {}, //Shows the active marker upon click
-        selectedPlace: {} //Shows the infoWindow to the selected place upon a marker
+        showingInfoWindow: false,
+        activeMarker: {}, 
+        selectedPlace: {} 
       };
       this.onMarkerClick=this.onMarkerClick.bind(this)
   }
-
-
-  onMarkerClick (props, marker, e) {
+  onMarkerClick (props, marker) {
     this.props.getStreetView(props.position.lat, props.position.lng)
     this.setState({
       selectedPlace: props,
@@ -23,7 +21,6 @@ export class MapContainer extends Component {
       showingInfoWindow: true
     });
   }
-
   mapClicked = (mapProps, map, event) => {
      const lat = event.latLng.lat();
      const lng = event.latLng.lng();
@@ -37,7 +34,7 @@ export class MapContainer extends Component {
       }
    });
   }  
-  onClose = props => {
+  onClose = () => {
     if (this.state.showingInfoWindow) {
       this.setState({
         showingInfoWindow: false,
@@ -45,8 +42,7 @@ export class MapContainer extends Component {
       });
     }
   };
-
-   displayMarkers = () => {
+  displayMarkers = () => {
     return this.props.restaurantsNearby.map((restaurant, index) => {
       return (
         <Marker
@@ -63,7 +59,6 @@ export class MapContainer extends Component {
       );
     })
   }
-  
   displayCurrentLocation = () => {
       return (
         <Marker
@@ -79,7 +74,6 @@ export class MapContainer extends Component {
         />
       );
   }
-
   displayInfoWindow = () => {
     return (
       <InfoWindow
@@ -95,8 +89,6 @@ export class MapContainer extends Component {
       </InfoWindow>
     );
   }
-
-
   render() {
     if (!this.props.loaded) {
       return <div>Loading...</div>;
