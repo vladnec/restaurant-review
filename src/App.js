@@ -36,6 +36,7 @@ class App extends Component {
       },
       modalAction: ''
     };
+    this.getNearbyPlaces =this.getNearbyPlaces.bind(this)
     this.syncData = this.syncData.bind(this)
     this.handleInputChange= this.handleInputChange.bind(this)
     this.onFilterRestaurantSubmit = this.onFilterRestaurantSubmit.bind(this)
@@ -64,7 +65,7 @@ class App extends Component {
         });
       })
       .then(() => {
-        this.getNearbyPlaces();
+        this.getNearbyPlaces(this.state.lat, this.state.lng);
       })
       .catch(err => {
         console.error(err.message);
@@ -103,11 +104,9 @@ class App extends Component {
       })
     });
   }
-  getNearbyPlaces() {
-    const radius = 10;
-    const { lat, lng } = this.state;
+  getNearbyPlaces(lat ,lng) {
+    const radius = 400;
     var self = this;
-
     axios
       .get(
         `${"https://cors-anywhere.herokuapp.com/"}https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=${radius}&type=restaurant&key=${API_KEY}`,
@@ -129,7 +128,7 @@ class App extends Component {
               }
             )
             .then(response => {
-              this.setState(prevState => ({
+              self.setState(prevState => ({
                 restaurantsNearby: [
                   ...prevState.restaurantsNearby,
                   response.data.result
@@ -161,6 +160,7 @@ class App extends Component {
         }
         getStreetView={this.getStreetView}
         restaurantStreetView={this.state.restaurantStreetView}
+        getNearbyPlaces={this.getNearbyPlaces}
         lat={this.state.lat}
         lng={this.state.lng}
         zoom={16}

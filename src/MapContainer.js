@@ -21,7 +21,7 @@ export class MapContainer extends Component {
       showingInfoWindow: true
     });
   }
-  mapClicked = (mapProps, map, event) => {
+  onMapClick = (mapProps, map, event) => {
      const lat = event.latLng.lat();
      const lng = event.latLng.lng();
      let url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${API_KEY}`
@@ -33,7 +33,12 @@ export class MapContainer extends Component {
         console.log('error')
       }
    });
-  }  
+  } 
+  onMapMove= (mapProps, map) => {
+    const lat = map.getCenter().lat()
+    const lng = map.getCenter().lng()
+    this.props.getNearbyPlaces(lat,lng)
+  } 
   onClose = () => {
     if (this.state.showingInfoWindow) {
       this.setState({
@@ -109,11 +114,8 @@ export class MapContainer extends Component {
           lat: this.props.lat,
           lng: this.props.lng
         }}
-        center={{
-          lat: this.props.lat,
-          lng: this.props.lng
-        }}
-        onClick={this.mapClicked}
+        onDragend={this.onMapMove}
+        onClick={this.onMapClick}
       >
         {this.displayCurrentLocation()}
         {this.displayMarkers()}
