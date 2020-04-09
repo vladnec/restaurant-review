@@ -1,0 +1,52 @@
+[
+    {
+        "name": "Your local restaurant",
+        "formatted_address": "Pfauenweg, 29",
+        "geometry": {
+            "location": {
+                "lat": 53.58962674081579,
+                "lng": 10.053601987807554
+            }
+        },
+        "id": "1293193129",
+        "user_ratings_total": 111,
+        "rating": 5,
+        "reviews": [
+            {
+                "author_name": "Max Mustermann",
+                "rating": 4,
+                "text": "Best restaurant ever."
+            },
+            {
+                "author_name": "Lil Peep",
+                "rating": 5,
+                "text": "Dibs on the wings!"
+            }
+        ]
+    },
+    {
+        "name": "Your local Pizzeria",
+        "formatted_address": "Bramfelder Strasse, 5",
+        "geometry": {
+            "location": {
+                "lat": 53.587713530072506,
+                "lng": 10.054007202016061
+            }
+        },
+        "id": "1830",
+        "user_ratings_total": 22,
+        "rating": 4,
+        "reviews": [
+            {
+                "author_name": "Karim Lotfy",
+                "rating": 3,
+                "text": "Tiny pizzeria next to canals!"
+            },
+            {
+                "author_name": "Comrade Dyatlov",
+                "rating": 3,
+                "text": "Not great, not terrible"
+            }
+        ]
+    }
+]

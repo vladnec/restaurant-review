@@ -45,6 +45,7 @@ class App extends Component {
     this.setState({ open: false });
   };
   componentDidMount() {
+    this.getLocalRestaurants()
     this.getBrowserLocation()
       .then(position => {
         this.setState({
@@ -58,6 +59,19 @@ class App extends Component {
       .catch(err => {
         console.error(err.message);
       });
+  }
+  getLocalRestaurants(){
+    axios.get('./restaurants.json')
+    .then(response => {
+      response.data.forEach(item => {
+        this.setState(prevState => ({
+          restaurantsNearby: [
+            ...prevState.restaurantsNearby,
+            item
+          ]
+        }))
+      })
+    })
   }
   getRestaurantID = () => {
     const id = this._restaurantID.toString();
