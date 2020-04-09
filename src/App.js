@@ -104,7 +104,7 @@ class App extends Component {
     });
   }
   getNearbyPlaces() {
-    const radius = 1500;
+    const radius = 10;
     const { lat, lng } = this.state;
     var self = this;
 

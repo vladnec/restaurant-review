@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { withStyles } from "@material-ui/styles";
+import cx from 'clsx';
 import Box from "@material-ui/core/Box";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
@@ -66,9 +67,9 @@ class RestaurantGoogleCard extends Component {
   render() {
 
     const { classes } = this.props;
-    return (
-      <Card elevation={0} className={classes.root}>
-        <CardContent className={classes.content} >
+    return (  
+      <Card elevation={0} className={ cx(classes.root, 'restaurant-card') }>
+        <CardContent className={cx (classes.content, 'restaurant-content')} >
           <IconButton id={this.props.restaurant.id} onClick={this.onCloseClick.bind(this)} className={classes.favorite}>
             <CloseIcon/>
           </IconButton>
