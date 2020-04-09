@@ -15,5 +15,24 @@ html {
     flex-direction: column;
     position: absolute;
     right:50px;
+    top:40px;
     overflow-y:scroll;
+}
+.rating-form {
+    position: absolute;
+    right:135px;
+    z-index:20;
+    text-align: center;
+}
+.rating-form input,
+.rating-form label {
+    width:50px;
+    display:inline-block;
+}
+.form-group{
+    display:inline-block;
+}
+.rating-form .button {
+    margin-left:20px;
+    width:100px;
 }

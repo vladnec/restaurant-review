@@ -15,6 +15,7 @@ class App extends Component {
     this.state = {
       open: false,
       restaurantsNearby: [],
+      restaurantsNearbyStore: [],
       restaurantStreetView: null,
       lat: null,
       lng: null,
@@ -27,8 +28,17 @@ class App extends Component {
         rating: 0,
         id: ''
       },
+      filter : {
+        from:'',
+        to:'',
+        asc:'',
+        desc:''
+      },
       modalAction: ''
     };
+    this.syncData = this.syncData.bind(this)
+    this.handleInputChange= this.handleInputChange.bind(this)
+    this.onFilterRestaurantSubmit = this.onFilterRestaurantSubmit.bind(this)
     this.onRestaurantRatingSubmit = this.onRestaurantRatingSubmit.bind(this)
     this.onRestaurantRatingChange = this.onRestaurantRatingChange.bind(this)
     this.onRestaurantFormSubmit = this.onRestaurantFormSubmit.bind(this)
@@ -71,6 +81,7 @@ class App extends Component {
           ]
         }))
       })
+      this.syncData()
     })
   }
   getRestaurantID = () => {
@@ -93,8 +104,9 @@ class App extends Component {
     });
   }
   getNearbyPlaces() {
-    const radius = 10;
+    const radius = 1500;
     const { lat, lng } = this.state;
+    var self = this;
 
     axios
       .get(
@@ -123,6 +135,7 @@ class App extends Component {
                   response.data.result
                 ]
               }));
+              self.syncData()
             });
         });
       });
@@ -173,9 +186,27 @@ class App extends Component {
     </Modal>
     )
   }
-  removeGoogleRestaurant(id) {
+  renderFilterOption() {
+    return (
+      <form className='rating-form' onSubmit={this.onFilterRestaurantSubmit.bind(this)}>
+        <div className="form-group">
+          <label>From</label>
+          <input required type="number" min="0" name="from" value={this.state.filter.from} onChange={this.handleInputChange} />
+        </div>
+        <div className="form-group">
+          <label>To</label>
+          <input required type="number" max="5" name="to" value={this.state.filter.to}  onChange={this.handleInputChange} />
+        </div>
+        <input type="submit" className="button" value="Filter"/>
+      </form>
+    )
+  }
+  onFilterRestaurantSubmit(e){
+    e.preventDefault();
+    const to  = parseInt(this.state.filter.to)
+    const from  = parseInt(this.state.filter.from)
     this.setState({
-      restaurantsNearby: this.state.restaurantsNearby.filter(restaurant => restaurant.id !== id)
+      restaurantsNearby : this.state.restaurantsNearbyStore.filter(restaurant => (restaurant.rating >= from && restaurant.rating <= to)).sort(this.sortByRating("rating", "desc"))
     })
   }
   onMapClickChange(lat, lng, address) {
@@ -206,6 +237,7 @@ class App extends Component {
         ...this.state.restaurantsNearby
       ]
     });
+    this.syncData()
     this.onCloseModal()
   }
   onRestaurantRatingChange(nextValue, id) {
@@ -243,9 +275,53 @@ class App extends Component {
           }
         }
         return item;
-      }),
+      })
     });
+    this.syncData()
     this.onCloseModal()
+  }
+  removeGoogleRestaurant(id) {
+    this.setState({
+      restaurantsNearby: this.state.restaurantsNearby.filter(restaurant => restaurant.id !== id),
+      restaurantsNearbyStore : this.state.restaurantsNearbyStore.filter(item => item.id !== id)
+    })
+  }
+  handleInputChange(e) {
+    let filter = this.state.filter;
+    filter[e.target.name] = e.target.value;
+    this.setState({
+      filter
+    });
+  }
+  sortByRating(key, order = 'asc') {
+    return function innerSort(a, b) {
+      if (!a.hasOwnProperty(key) || !b.hasOwnProperty(key)) {
+        return 0;
+      }
+  
+      const varA = (typeof a[key] === 'string')
+        ? a[key].toUpperCase() : a[key];
+      const varB = (typeof b[key] === 'string')
+        ? b[key].toUpperCase() : b[key];
+  
+      let comparison = 0;
+      if (varA > varB) {
+        comparison = 1;
+      } else if (varA < varB) {
+        comparison = -1;
+      }
+      return (
+        (order === 'desc') ? (comparison * -1) : comparison
+      );
+    };
+  }
+  syncData() {
+    var self= this;
+    setTimeout(function(){
+      self.setState({
+        restaurantsNearbyStore : self.state.restaurantsNearby
+      }) 
+    })
   }
   render() {
     return (
@@ -253,6 +329,7 @@ class App extends Component {
         <div className="map-container">
           {this.renderGoogleMap()}
         </div>
+        {this.renderFilterOption()}
         <div className="restaurants-container">
           {this.renderGoogleRestaurants()}
         </div>
