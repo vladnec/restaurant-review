@@ -7,7 +7,7 @@ import Typography from "@material-ui/core/Typography";
 import IconButton from "@material-ui/core/IconButton";
 import LocationOn from "@material-ui/icons/LocationOn";
 import StarRatingComponent from 'react-star-rating-component';
-import Favorite from "@material-ui/icons/Favorite";
+import CloseIcon from '@material-ui/icons/Close';
 import PropTypes from "prop-types";
 import MoreHoriz from "@material-ui/icons/MoreHoriz";
 import FaceGroup from "@mui-treasury/components/group/face";
@@ -56,16 +56,12 @@ const styles = (theme) => ({
 
 
 class RestaurantGoogleCard extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      rating: 1,
-      reviewsNumber: null,
-      reviews: {},
-    };
-  }
+
   onStarClick(nextValue, prevValue, name) {
     this.props.changeRestaurantRating(nextValue, name)
+  }
+  onCloseClick(){
+    this.props.removeGoogleRestaurant(this.props.restaurant.id)
   }
 
   render() {
@@ -74,8 +70,8 @@ class RestaurantGoogleCard extends Component {
     return (
       <Card elevation={0} className={classes.root}>
         <CardContent className={classes.content} >
-          <IconButton className={classes.favorite}>
-            <Favorite />
+          <IconButton id={this.props.restaurant.id} onClick={this.onCloseClick.bind(this)} className={classes.favorite}>
+            <CloseIcon/>
           </IconButton>
           <h3 className={classes.title}>{this.props.restaurant.name}</h3>
           <Box color={"grey.500"} display={"flex"} alignItems={"center"} mb={1} >

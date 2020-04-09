@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import MapContainer from "./MapContainer";
 import GoogleRestaurantCard from "./components/GoogleRestaurantCard";
+import ReviewRestaurantForm from "./components/ReviewRestaurantForm";
 import NewRestaurantForm from "./components/restaurantForm/RegisterForm";
 import API_KEY from './API_KEY';
 
@@ -12,31 +13,45 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      open : false,
+      open: false,
       restaurantsNearby: [],
       lat: null,
       lng: null,
-      newRestaurantLat:null,
-      newRestaurantLng:null,
-      newRestaurantName:null,
-      newRestaurantRating:null,
-      newRestaurantAddress:null,
-      restaurantStreetView:null,
-      newRestaurantReviews:[]
+      newRestaurantLat: null,
+      newRestaurantLng: null,
+      newRestaurantName: null,
+      newRestaurantRating: null,
+      newRestaurantAddress: null,
+      restaurantStreetView: null,
+      newReview: {
+        rating: 0,
+        id: ''
+      },
+      modalAction: ''
     };
-    this.changeRestaurantRating=this.changeRestaurantRating.bind(this)
-    this.onRestaurantFormSubmit=this.onRestaurantFormSubmit.bind(this)
-    this.getStreetView=this.getStreetView.bind(this)
+    this.onRestaurantRatingSubmit = this.onRestaurantRatingSubmit.bind(this)
+    this.changeRestaurantRating = this.changeRestaurantRating.bind(this)
+    this.onRestaurantFormSubmit = this.onRestaurantFormSubmit.bind(this)
+    this.removeGoogleRestaurant = this.removeGoogleRestaurant.bind(this)
+    this.getStreetView = this.getStreetView.bind(this)
   }
   _isMounted = false;
+  _restaurantID = 1;
 
-  onOpenModal = () => {
+  onOpenModal = (modalAction) => {
+    this.setState({ modalAction })
     this.setState({ open: true });
   };
- 
+
   onCloseModal = () => {
     this.setState({ open: false });
   };
+
+  getRestaurantID = () => {
+    const id = this._restaurantID.toString();
+    this._restaurantID += 1;
+    return id;
+  }
 
   componentDidMount() {
     this.getBrowserLocation()
@@ -58,6 +73,7 @@ class App extends Component {
       restaurantsNearby: [
         {
           name: formData.restaurantName,
+          id: this.getRestaurantID(),
           formatted_address: this.state.newRestaurantAddress,
           geometry: {
             location: {
@@ -65,59 +81,86 @@ class App extends Component {
               lng: this.state.newRestaurantLng
             }
           },
-          rating: parseInt(formData.rating),
-          reviews: [
-            {
-              author_name: "vlad",
-              rating: 5,
-              text: "very clean, nice"
-            }
-          ]
+          rating: 0
         },
         ...this.state.restaurantsNearby
       ]
     });
     this.onCloseModal()
   }
-  changeRestaurantRating(nextValue, id) {
+
+  removeGoogleRestaurant(id) {
     this.setState({
-      restaurantsNearby:this.state.restaurantsNearby.map(item=>{
-        if(item.id === id ){
-          if(item.hasRated) {
+      restaurantsNearby: this.state.restaurantsNearby.filter(restaurant => restaurant.id !== id)
+    })
+  }
+  changeRestaurantRating(nextValue, id) {
+    this.onOpenModal('review')
+    this.setState({
+      newReview: {
+        rating: nextValue,
+        id: id
+      }
+    })
+  }
+
+  onRestaurantRatingSubmit(formData) {
+    let id = this.state.newReview.id
+    let rating = this.state.newReview.rating
+    this.setState({
+      restaurantsNearby: this.state.restaurantsNearby.map(item => {
+        if (item.id === id) {
+          if (item.hasRated) {
             return {
               ...item,
-              rating:nextValue,
+              rating: rating,
               hasRated: true,
-              user_ratings_total : item.user_ratings_total 
+              user_ratings_total: item.user_ratings_total,
+              reviews: [
+                {
+                  author_name: formData.authorName,
+                  rating: rating,
+                  text: formData.review
+                }
+              ]
             }
           } else {
             return {
               ...item,
-              rating:nextValue,
+              rating: rating,
               hasRated: true,
-              user_ratings_total : item.user_ratings_total ? item.user_ratings_total + 1 : 1
+              user_ratings_total: item.user_ratings_total ? item.user_ratings_total + 1 : 1,
+              reviews: [
+                {
+                  author_name: formData.authorName,
+                  rating: rating,
+                  text: formData.review
+                }
+              ]
             }
           }
         }
         return item;
       }),
     });
+    this.onCloseModal()
   }
 
-  
+
   displayGoogleRestaurants() {
     return this.state.restaurantsNearby.map((restaurant, index) => {
       return (
         <GoogleRestaurantCard
-        key={index}
-        changeRestaurantRating={this.changeRestaurantRating}
-        restaurant={restaurant}
+          key={index}
+          changeRestaurantRating={this.changeRestaurantRating}
+          removeGoogleRestaurant={this.removeGoogleRestaurant}
+          restaurant={restaurant}
         />
       )
     })
   }
   onMapClickChange(lat, lng, formattedAddress) {
-    this.onOpenModal()
+    this.onOpenModal('restaurant')
     this.setState({
       newRestaurantAddress: formattedAddress,
       newRestaurantLat: lat,
@@ -125,17 +168,17 @@ class App extends Component {
     });
   }
   getBrowserLocation() {
-    return new Promise(function(resolve, reject) {
+    return new Promise(function (resolve, reject) {
       navigator.geolocation.getCurrentPosition(resolve, reject);
     });
   }
   getStreetView(lat, lng) {
     const self = this;
-    let url = `https://maps.googleapis.com/maps/api/streetview?size=600x300&location=${lat},${lng}&heading=0&pitch=-0.76&key=${API_KEY}`;
+    let url = `https://maps.googleapis.com/maps/api/streetview?size=300x150&location=${lat},${lng}&heading=0&pitch=-0.76&key=${API_KEY}`;
     axios.get(url).then(response => {
       self.setState({
-        restaurantStreetView : response.config.url
-      }) 
+        restaurantStreetView: response.config.url
+      })
     });
   }
 
@@ -155,7 +198,7 @@ class App extends Component {
           axios
             .get(
               `${"https://cors-anywhere.herokuapp.com/"}https://maps.googleapis.com/maps/api/place/details/json?placeid=${
-                item.place_id
+              item.place_id
               }&key=${API_KEY}`,
               {
                 headers: {
@@ -176,34 +219,46 @@ class App extends Component {
   }
 
   render() {
-    const {open} = this.state;
+    const { open } = this.state;
     return (
       <div>
-         <div className="map-container">
-            <MapContainer
-              restaurantsNearby={this.state.restaurantsNearby}
-              onMapClickChange={(x, y, info) =>
-                this.onMapClickChange(x, y, info)
-              }
-              getStreetView={this.getStreetView}
-              restaurantStreetView = {this.state.restaurantStreetView}
-              lat={this.state.lat}
-              lng={this.state.lng}
-              zoom={16}
-            />
-          </div>
-          <div className="restaurants-container">
-              {this.displayGoogleRestaurants()}
-          </div>
-        <Modal 
+        <div className="map-container">
+          <MapContainer
+            restaurantsNearby={this.state.restaurantsNearby}
+            onMapClickChange={(x, y, info) =>
+              this.onMapClickChange(x, y, info)
+            }
+            getStreetView={this.getStreetView}
+            restaurantStreetView={this.state.restaurantStreetView}
+            lat={this.state.lat}
+            lng={this.state.lng}
+            zoom={16}
+          />
+        </div>
+        <div className="restaurants-container">
+          {this.displayGoogleRestaurants()}
+        </div>
+        {this.state.modalAction === 'restaurant' ? (
+          <Modal
             open={open}
             closeIconSize={14}
             onClose={this.onCloseModal}
             center>
             <NewRestaurantForm
-            onRestaurantFormSubmit={this.onRestaurantFormSubmit}
+              onRestaurantFormSubmit={this.onRestaurantFormSubmit}
             />
           </Modal>
+        ) :
+          <Modal
+            open={open}
+            closeIconSize={14}
+            onClose={this.onCloseModal}
+            center>
+            <ReviewRestaurantForm
+              onRestaurantRatingSubmit={this.onRestaurantRatingSubmit}
+            />
+          </Modal>
+        }
       </div>
     );
   }
