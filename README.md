@@ -1,3 +1,15 @@
+## Restaurant Review App
+Restaurant Review is a Minimum Viable Product based on Yelp. App I had to built for my last project for the OpenClassrooms 'Front End Web Developer' Path. The app is fully developed by me, using React.js, Google Maps and Material UI.
+
+To run the project you have to execute : 
+### `npm install`
+### `npm start`
+
+For security reasons, I have not commited my API key for google maps, therefore, you need to generate your own and create a new 'API_KEY.js' file in /src with following code inside:
+
+`export default 'YOUR_API_KEY'`
+
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
